@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AA分账系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header-section">
+            <h1>💰 可恶这就是冰（青）岛回来后的戒断反应吗</h1>
+            <div class="user-section" id="userSection">
+                <div class="user-info" id="userInfo" style="display: none;">
+                    <span id="userDisplayName"></span>
+                    <button onclick="showChangePasswordModal()" class="change-password-btn">修改密码</button>
+                    <button onclick="logout()" class="logout-btn">登出</button>
+                </div>
+                <button onclick="showLoginForm()" id="loginBtn" class="login-btn-header">登录</button>
+            </div>
+        </div>
+
+        <!-- 管理员验证模态框 -->
+        <div id="adminModal" class="admin-modal" style="display: none;">
+            <div class="admin-modal-content">
+                <h3>🔐 管理员验证</h3>
+                <p>请输入管理员密码以进行此操作</p>
+                <input type="password" id="adminPassword" placeholder="请输入管理员密码">
+                <div class="admin-modal-buttons">
+                    <button onclick="verifyAdmin()" class="verify-btn">验证</button>
+                    <button onclick="closeAdminModal()" class="cancel-btn">取消</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 参与者管理模态框 -->
+        <div id="participantModal" class="participant-modal" style="display: none;">
+            <div class="participant-modal-content">
+                <div class="modal-header">
+                    <h3>👥 参与者管理</h3>
+                    <button onclick="closeParticipantModal()" class="close-modal-btn">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="participant-list-container">
+                        <div id="participantModalList" class="participant-modal-list"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="closeParticipantModal()" class="cancel-btn">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 登录模态框 -->
+        <div id="loginModal" class="login-modal" style="display: none;">
+            <div class="login-modal-content">
+                <div class="modal-header">
+                    <h3>🔐 用户登录</h3>
+                    <button onclick="closeLoginModal()" class="close-modal-btn">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="login-form">
+                        <div class="form-group">
+                            <label>用户名：</label>
+                            <input type="text" id="loginUsername" placeholder="请输入用户名">
+                        </div>
+                        <div class="form-group">
+                            <label>密码：</label>
+                            <input type="password" id="loginPassword" placeholder="请输入密码">
+                        </div>
+                        <div class="login-buttons">
+                            <button onclick="login()" class="login-btn">登录</button>
+                            <button onclick="showRegisterForm()" class="register-link-btn">注册新用户</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 注册模态框 -->
+        <div id="registerModal" class="register-modal" style="display: none;">
+            <div class="register-modal-content">
+                <div class="modal-header">
+                    <h3>📝 用户注册</h3>
+                    <button onclick="closeRegisterModal()" class="close-modal-btn">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="register-form">
+                        <div class="form-group">
+                            <label>用户名：</label>
+                            <input type="text" id="registerUsername" placeholder="请输入用户名">
+                        </div>
+                        <div class="form-group">
+                            <label>显示名称：</label>
+                            <input type="text" id="registerDisplayName" placeholder="请输入显示名称">
+                        </div>
+                        <div class="form-group">
+                            <label>密码：</label>
+                            <input type="password" id="registerPassword" placeholder="请输入密码">
+                        </div>
+                        <div class="register-buttons">
+                            <button onclick="register()" class="register-btn">注册</button>
+                            <button onclick="showLoginForm()" class="login-link-btn">返回登录</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 添加账单按钮 -->
+        <div class="add-bill-toggle-section">
+            <button id="toggleAddBillBtn" class="add-btn">添加账单</button>
+        </div>
+        <!-- 添加账单区域（初始隐藏） -->
+        <div id="addBillSection" class="add-bill-section" style="display:none;">
+            <h2>添加新账单</h2>
+            <div class="form-group">
+                <label>账单描述：</label>
+                <input type="text" id="description" placeholder="例如：聚餐费用">
+            </div>
+
+            <div class="form-group">
+                <label>总金额：</label>
+                <input type="number" id="amount" placeholder="0.00" step="0.01">
+            </div>
+
+            <div class="form-group">
+                <label>付款人：</label>
+                <select id="payer" class="payer-select">
+                    <option value="">请选择付款人</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>参与者：</label>
+                <div class="participants-section">
+                    <div class="add-participant-section">
+                        <select id="newParticipantSelect" class="participant-select">
+                            <option value="">选择已注册用户</option>
+                        </select>
+                        <button onclick="addParticipant()" class="add-participant-btn">添加参与者</button>
+                        <button onclick="showParticipantModal()" class="manage-participants-btn">管理参与者</button>
+                    </div>
+                    <div class="participants-instruction">
+                        <span class="instruction-text">💡 参与者只能是已注册用户，点击下方标签选择参与账单人员</span>
+                    </div>
+                    <div id="participantsList" class="participants-list"></div>
+                    <div class="selected-participants-info">
+                        <span id="selectedCount">已选择：0人</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>账单图片（最多3张）：</label>
+                <div class="image-upload-section">
+                    <input type="file" id="imageUpload" accept="image/*" multiple onchange="handleImageUpload(event)">
+                    <div id="imagePreview" class="image-preview"></div>
+                </div>
+            </div>
+
+            <button onclick="addBill()" class="add-btn">添加账单</button>
+        </div>
+
+        <!-- 账单列表区域 -->
+        <div class="bills-section">
+            <h2>账单列表</h2>
+            <div id="billsList" class="bills-list"></div>
+        </div>
+
+        <!-- 统计区域 -->
+        <div class="summary-section">
+            <h2>统计信息</h2>
+            <div id="summary" class="summary"></div>
+        </div>
+    </div>
+
+    <!-- 修改密码模态框 -->
+    <div id="changePasswordModal" class="change-password-modal" style="display: none;">
+        <div class="change-password-modal-content">
+            <div class="modal-header">
+                <h3>🔑 修改密码</h3>
+                <button onclick="closeChangePasswordModal()" class="close-modal-btn">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>原密码：</label>
+                    <input type="password" id="oldPassword" placeholder="请输入原密码">
+                </div>
+                <div class="form-group">
+                    <label>新密码：</label>
+                    <input type="password" id="newPassword" placeholder="请输入新密码">
+                </div>
+                <div class="form-group">
+                    <label>确认新密码：</label>
+                    <input type="password" id="confirmNewPassword" placeholder="请再次输入新密码">
+                </div>
+                <div class="change-password-buttons">
+                    <button onclick="changePassword()" class="change-password-btn">修改</button>
+                    <button onclick="closeChangePasswordModal()" class="cancel-btn">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
